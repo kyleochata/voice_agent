@@ -15,7 +15,7 @@ from typing import Optional, Dict, Tuple
 load_dotenv()
 
 
-class Assistant(Agent):
+class Intake_Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(
             instructions="""
@@ -142,7 +142,7 @@ async def entrypoint(ctx: agents.JobContext):
 
     session = AgentSession(
         stt=deepgram.STT(model="nova-3", language="multi"),
-        llm=openai.LLM(model="gpt-4o-mini"),
+        llm=openai.LLM(model="gpt-4o"),
         tts=elevenlabs.TTS(
             voice_id="ODq5zmih8GrVes37Dizd",
             model="eleven_multilingual_v2"
@@ -150,7 +150,7 @@ async def entrypoint(ctx: agents.JobContext):
         turn_detection=MultilingualModel(),
     )
 
-    assistant = Assistant()
+    assistant = Intake_Assistant()
     await session.start(
         room=ctx.room,
         agent=assistant,

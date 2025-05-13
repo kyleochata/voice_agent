@@ -9,10 +9,15 @@ I was able to complete the first requirement of the challenge within the 4-hour 
 - [x] Intake of first name, with confirmation. (spelled back to user with phonetic alphabet)
 - [x] Intake of last name, with confirmation. (spelled back to user with phonetic alphabet)
 - [x] Intake of insurance ID. 
+- Demo of completed Work:
+    - https://drive.google.com/file/d/1JAuBy1GS-gcjTwEkleaxrbmoMoP7OmlX/view?usp=drive_link
 
 ## Challenges Faced
 1. **LiveKit Learning Curve**: Understanding the LiveKit ecosystem and WebSocket protocol took significant time. 
 2. **Time Constraints**: The 4-hour window was challenging for learning new technologies while implementing
+3. **OpenAPI Usage Constraints**: I ran into multiple usage limits for the OpenAPI as I only use the free. 
+    - This is due to lack of intimate knowledge of how the LiveKit SDK is actively sending off information to OpenAI. 
+    - Future Learning: diving deeper into the docs to figure out a caching of information or getting a local LLM to avoid API calls.
 
 ## Next Steps (If Given More Time)
 1. Pool the data in a format for api call to STEDI
@@ -20,6 +25,7 @@ I was able to complete the first requirement of the challenge within the 4-hour 
     a. class SecondAgent(Assistant): inorder to get the user_data context into the second agent.
 3. More clear and defined fallback methods for the agents to invoke when information from intake is missing or misrepresented
 4. Separation of code into other files for cleanliness
+5. Caching or converting to a local LLM for api calls to OpenAI run out of their free tier quickly
 
 ## Key Learnings
 Through this challenge, I've gained:
