@@ -34,3 +34,20 @@ Through this challenge, I've gained:
 
 ## Request for Consideration
 While I couldn't complete all requirements in the given time, I'm confident that with more time (or in a real work environment with team support), I could deliver a complete solution. I'm a quick learner and would appreciate the opportunity to discuss how I would approach the remaining components.
+
+
+# Usage
+Please ensure that there is a .env file at the root directory that includes:
+- DEEPGRAM_API_KEY=
+- OPENAI_API_KEY=
+- ELEVEN_API_KEY=
+- LIVEKIT_URL=
+- LIVEKIT_API_KEY=
+- LIVEKIT_API_SECRET=
+- STEDI_API_KEY=
+
+In the console please run `python agent.py download-files`, followed by `python agent.py console` to interact with the voice-agent. 
+
+
+- ***Known isssue of OpenAI API rate limit hits after getting collection of the first, last names and the insurance id numbers***
+
