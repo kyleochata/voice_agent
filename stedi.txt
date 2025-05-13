@@ -1,0 +1,27 @@
+curl --request POST \
+  --url 'https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/eligibility/v3' \
+  --header 'Authorization: Key {test_api_key}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "controlNumber":"112233445",
+    "tradingPartnerServiceId": "G84980",
+    "provider": {
+        "organizationName": "Provider Name",
+        "npi": "1999999984"
+    },
+    "subscriber": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "memberId": "BCBSTX123456"
+    },
+    "dependents": [
+        {
+            "firstName": "Jane",
+            "lastName": "Doe",
+            "dateOfBirth": "20150101"
+        }
+    ],
+    "encounter": {
+        "serviceTypeCodes": ["30"]
+    }
+}'
