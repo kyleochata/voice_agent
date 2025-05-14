@@ -20,11 +20,15 @@ I was able to complete the most of the requirement of the challenge. Created an 
 
 ## Challenges Faced
 1. **LiveKit Learning Curve**: Understanding the LiveKit ecosystem and WebSocket protocol took significant time. 
-<!-- 2. **Time Constraints**: The 4-hour window was challenging for learning new technologies while implementing -->
-2. **OpenAPI Usage Constraints**: I ran into multiple usage limits for the OpenAPI as I only use the free. 
-    - This is due to lack of intimate knowledge of how the LiveKit SDK is actively sending off information to OpenAI. 
-    - Future Learning: diving deeper into the docs to figure out a caching of information or getting a local LLM to avoid API calls.
-3. **ElevenLabs API Usage Constraints**: I am out of emails for creating free elevenapi accounts.
+
+2. **API Usage Constraints**: I ran into multiple usage limits for the OpenAPI and Elevenlabs APIs
+    - Literally was on my last email using up the last of the monthly credits for elevenlabs.
+    - Had to slow the program down as seen in the demo with timeouts and slow server retries. 
+3. **ElevenLabs API Usage Constraints**: Just had to mention this twice.
+4. **Python**: I have maybe one other project with python in the last 6 months so it was a dash to get back to speed.
+    - I was prepping TypeScript and Node in the days leading up to this and was rather shocked by livekits documentation and the challenge being in Python.
+    - The reason I chose Python over the experimental Typescript was due to there being more documentation with the python files. 
+    - It was enjoyable to be put to the fire and see how much I was able to get done while not prepping the language.
 
 ## Next Steps (If Given More Time)
 
