@@ -248,7 +248,14 @@ class Stedi_CheckAgent(BaseAgent):
             await self.session.say(validation_result["message"])
         
         print(f"About to transition with needs_representative={self.session.state.get('needs_representative')}")
-        return await self.transition()
+        if self.session.state["retry_validation"]:
+            if self.session.state["insurance_validation_retry_count"] == 1:
+                return Collect_InsuranceAgent(job_context=JobContext)
+            else:
+                return TransferToRepresentativeAgent(job_context=JobContext)
+        else:
+            return EndingAgent(job_context=JobContext)
+        
 
 
 
@@ -340,8 +347,8 @@ async def entrypoint(ctx: JobContext) -> None:
     await ctx.connect()
     session = AgentSession()
     session.userdata = SurveyData()
-    session.state = {"current_node": "collect_fname"}
-    await session.start(agent=Collect_FirstNameAgent(ctx), room=ctx.room)
+    session.state = {"current_node": "stedi_send"}
+    await session.start(agent=Stedi_CheckAgent(ctx), room=ctx.room)
 
 if __name__ == "__main__":
     cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
