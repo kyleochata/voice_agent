@@ -69,7 +69,7 @@ async def check_insurance_eligibility(
         async with aiohttp.ClientSession() as session:
             async with session.post(stedi_api_url, json=payload, headers=headers) as response:
                 response_text = await response.text()
-                
+
                 try:
                     response_data = json.loads(response_text)
                 except json.JSONDecodeError:
@@ -188,13 +188,17 @@ def validate_insurance_eligibility(response_data, retry_count=0):
         
         if network_code == "Y" or network_indicator == "Yes":
             result["network_status"] = "in-network"
-            result["message"] = f"Your copay for in-network office visits is ${result['copay_amount']} dollars."
+            result["message"] = f"Your copay for in-network office visits is {result['copay_amount']} dollars."
+            result["message"] += "Thank you for your patience. Have a good day"
         elif network_code == "N" or network_indicator == "No":
             result["network_status"] = "out-of-network"
             result["message"] = "You have office visit coverage, but this provider is out-of-network under your plan."
+            result["message"] += "Thank you for your patience. Have a good day"
         else:
             result["network_status"] = "unknown"
             result["message"] = "Your insurance doesn't specify if this provider is in-network. I'll connect you to a representative."
+            result["message"] += "Thank you for your patience. Connecting to a representative"
             result["needs_representative"] = True
-    
+        
+    print(result)
     return result

@@ -53,7 +53,6 @@ class BaseAgent(Agent):
         self.session.state["current_node"] = next_node
         agent_cls: Type[Agent] = flow[next_node]["agent"]
         newAgent = agent_cls(self.job_context)
-        print(newAgent)
         return newAgent
 
 class DataCollectorAgent(BaseAgent):
@@ -249,17 +248,15 @@ class Stedi_CheckAgent(BaseAgent):
         
         print(f"About to transition with needs_representative={self.session.state.get('needs_representative')}")
         if self.session.state["retry_validation"]:
-            if self.session.state["insurance_validation_retry_count"] == 1:
+            if self.session.state["insurance_validation_retry_count"] <= 1:
                 return Collect_InsuranceAgent(job_context=JobContext)
             else:
                 return TransferToRepresentativeAgent(job_context=JobContext)
         else:
+            
             return EndingAgent(job_context=JobContext)
         
 
-
-
-# Fix for TransferToRepresentativeAgent
 class TransferToRepresentativeAgent(BaseAgent):
     def __init__(self, job_context: JobContext) -> None:
         super().__init__(job_context=job_context, instructions="Transfer the user to a representative")
@@ -277,7 +274,7 @@ class TransferToRepresentativeAgent(BaseAgent):
 
     
 
-class EndingAgent(BaseAgent):
+class EndingAgent(Agent):
     def __init__(self, job_context: JobContext) -> None:
         super().__init__(job_context=job_context, instructions="Conclude the conversation with a friendly goodbye")
     
@@ -326,18 +323,23 @@ flow = {
     },
     "stedi_send": {
         "agent": Stedi_CheckAgent,
-        "next": lambda state: "transfer_to_rep" if state.get("needs_representative", False) 
-                else "collect_insurance" if state.get("retry_validation", False)
-                else "goodbye"
-    },
-    "transfer_to_rep": {
-        "agent": TransferToRepresentativeAgent,
-        "next": None
-    },
-    "goodbye": {
-        "agent": EndingAgent,
-        "next": None
-    }
+        "next": None,
+
+#TODO: look into why the flow bricks here. We walk through and call transition() fine and it makes it all the way to agent creation
+# then stops. 
+    #     "next": lambda state: "transfer_to_rep" if state.get("needs_representative", False) 
+    #             else "collect_insurance" if state.get("retry_validation", False)
+    #             else "goodbye"
+    # },
+    # "transfer_to_rep": {
+    #     "agent": TransferToRepresentativeAgent,
+    #     "next": None
+    # },
+    # "goodbye": {
+    #     "agent": EndingAgent,
+    #     "next": None
+    # }
+}
 }
 
 
@@ -347,8 +349,8 @@ async def entrypoint(ctx: JobContext) -> None:
     await ctx.connect()
     session = AgentSession()
     session.userdata = SurveyData()
-    session.state = {"current_node": "stedi_send"}
-    await session.start(agent=Stedi_CheckAgent(ctx), room=ctx.room)
+    session.state = {"current_node": "collect_fname"}
+    await session.start(agent=Collect_FirstNameAgent(ctx), room=ctx.room)
 
 if __name__ == "__main__":
     cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
