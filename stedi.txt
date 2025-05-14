@@ -4,24 +4,141 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --data '{
     "controlNumber":"112233445",
-    "tradingPartnerServiceId": "G84980",
+    "tradingPartnerServiceId": "60054",
     "provider": {
         "organizationName": "Provider Name",
         "npi": "1999999984"
     },
     "subscriber": {
-        "firstName": "John",
+        "firstName": "Jane",
         "lastName": "Doe",
-        "memberId": "BCBSTX123456"
+        "dateOfBirth": "20040404",
+        "memberId": "AETNA12345"
     },
-    "dependents": [
-        {
-            "firstName": "Jane",
-            "lastName": "Doe",
-            "dateOfBirth": "20150101"
-        }
-    ],
     "encounter": {
         "serviceTypeCodes": ["30"]
     }
 }'
+
+        # if not is_correct:
+        #     # If incorrect, go back to the previous stage
+        #     current = self.session.state.get("current_node")
+            # if "fname_confirm" in current:
+            #     self.session.state["current_node"] = "collect_fname"
+            # elif "lname_confirm" in current:
+            #     self.session.state["current_node"] = "collect_lname"
+            # elif "insurance_confirm" in current:
+            #     self.session.state["current_node"] = "collect_insurance"
+
+    # async def collect_information(self, session: AgentSession):
+    #     # Collect first name
+    #     if not self.user_data["first_name"]:
+    #         success, first_name = await self.collect_name_part(session, "first name")
+    #         if not success:
+    #             return await self.collect_information(session)
+    #         self.user_data["first_name"] = first_name
+
+    #     # Collect last name
+    #     if not self.user_data["last_name"]:
+    #         success, last_name = await self.collect_name_part(session, "last name")
+    #         if not success:
+    #             # Clear first name if last name is wrong to start fresh
+    #             self.user_data["first_name"] = None
+    #             return await self.collect_information(session)
+    #         self.user_data["last_name"] = last_name
+
+    #     # Collect insurance ID
+    #     if not self.user_data["insurance_id"]:
+    #         success, insurance_id = await self.collect_insurance_id(session)
+    #         if not success:
+    #             # Don't clear names if just insurance ID is wrong
+    #             self.user_data["insurance_id"] = None
+    #             return await self.collect_information(session)
+    #         self.user_data["insurance_id"] = insurance_id
+
+    #     # Final confirmation
+    #     if not self.confirmed:
+    #         full_name = f"{self.user_data['first_name']} {self.user_data['last_name']}"
+    #         spelled_name = await self.spell_out(full_name)
+    #         spelled_id = await self.spell_out(self.user_data["insurance_id"])
+            
+    #         await session.say(f"Let me confirm all information. Your name is {full_name}. That's {spelled_name}. Your insurance ID is {self.user_data['insurance_id']}. That's {spelled_id}. Is everything correct?")
+            
+    #         final_confirmation = await session.listen_for_text()
+    #         if "no" in final_confirmation.lower():
+    #             self.user_data = {"first_name": None, "last_name": None, "insurance_id": None}
+    #             return await self.collect_information(session)
+            
+    #         self.confirmed = True
+    #         await session.say("Thank you for confirming. Your information has been received and will be processed.")
+    #         print("Data ready for API call:", self.user_data)
+
+
+    import time
+import asyncio
+from livekit.plugins import openai
+
+class RateLimiter:
+    def __init__(self, calls_per_minute=2):
+        self.calls_per_minute = calls_per_minute
+        self.interval = 60.0 / calls_per_minute  # seconds between each call
+        self.last_call_time = 0
+
+    async def wait(self):
+        current_time = time.time()
+        time_since_last_call = current_time - self.last_call_time
+        
+        if time_since_last_call < self.interval:
+            wait_time = self.interval - time_since_last_call
+            await asyncio.sleep(wait_time)
+        
+        self.last_call_time = time.time()
+
+class RateLimitedOpenAI(openai.LLM):
+    def __init__(self, model="gpt-4o", calls_per_minute=2):
+        super().__init__(model=model)
+        self.rate_limiter = RateLimiter(calls_per_minute=calls_per_minute)
+        self.session = None
+    
+    def set_session(self, session):
+        self.session = session
+    
+    async def generate_text(self, *args, **kwargs):
+        current_time = time.time()
+        time_since_last_call = current_time - self.rate_limiter.last_call_time
+        
+        if time_since_last_call < self.rate_limiter.interval:
+            wait_time = self.rate_limiter.interval - time_since_last_call
+            
+            # Print for developers
+            print(f"Rate limiting in effect. Waiting {wait_time:.2f} seconds before making OpenAI API call (free tier limitation).")
+            
+            # Inform the user if we have a session
+            if self.session:
+                await self.session.say("I'm thinking about your request. This might take a moment due to processing limits.")
+            
+            await self.rate_limiter.wait()
+        else:
+            await self.rate_limiter.wait()
+        
+        return await super().generate_text(*args, **kwargs)
+    
+    async def generate_chat_completion(self, *args, **kwargs):
+        current_time = time.time()
+        time_since_last_call = current_time - self.rate_limiter.last_call_time
+        
+        if time_since_last_call < self.rate_limiter.interval:
+            wait_time = self.rate_limiter.interval - time_since_last_call
+            
+            # Print for developers
+            print(f"Rate limiting in effect. Waiting {wait_time:.2f} seconds before making OpenAI API call (free tier limitation).")
+            
+            # Inform the user if we have a session
+            if self.session:
+                await self.session.say("I'm thinking about your request. This might take a moment due to processing limits.")
+            
+            await self.rate_limiter.wait()
+        else:
+            await self.rate_limiter.wait()
+        
+        return await super().generate_chat_completion(*args, **kwargs)
