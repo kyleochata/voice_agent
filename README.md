@@ -44,7 +44,8 @@ I was able to complete the most of the requirement of the challenge. Created an 
         - Change it to a deciscion based flow: https://github.com/livekit-examples/python-agents-examples/blob/main/flows/multi_stage_flow.py
         - Potential issues: 
             - Need to see how switching workflows mid progam works. May need addition helpers to get it from one workflow architecture to another. More research needed. 
-4. Modularize the code
+4. Modularize the code.
+    - Tried to do it at the end but ran into circular dependency issues. Depending on when this is viewed, I may have fixed this.
 
 ## Key Learnings
 Through this challenge, I've gained:
